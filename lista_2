@@ -1,0 +1,183 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char nome[50];
+    int funcional;
+    char titulacao[20];
+} Professor;
+
+typedef struct {
+    char nome[50];
+    int codigo;
+    int carga_horaria;
+    Professor professor_responsavel;
+    int estudantes[15];
+    int total_estudantes;
+} Disciplina;
+
+typedef struct {
+    char nome[50];
+    int matricula;
+    int idade;
+} Estudante;
+
+int le_valida_idade() {
+    int idade;
+    do {
+        printf("Digite a idade do estudante (entre 16 e 26): ");
+        scanf("%d", &idade);
+    } while (idade < 16 || idade > 26);
+
+    return idade;
+}
+
+void bubble_sort(Estudante *estudantes, int n) {
+    int i, j;
+    Estudante temp;
+
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (estudantes[j].idade > estudantes[j + 1].idade) {
+                temp = estudantes[j];
+                estudantes[j] = estudantes[j + 1];
+                estudantes[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void bubble_sort_desc(Estudante *estudantes, int n) {
+    int i, j;
+    Estudante temp;
+
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (estudantes[j].idade < estudantes[j + 1].idade) {
+                temp = estudantes[j];
+                estudantes[j] = estudantes[j + 1];
+                estudantes[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    Professor professores[3];
+    Disciplina disciplinas[2];
+    Estudante estudantes[15];
+
+    int i;
+
+    for (i = 0; i < 3; i++) {
+        printf("Cadastro do professor %d:\n", i + 1);
+
+        printf("Digite o nome do professor: ");
+        scanf("%s", professores[i].nome);
+
+        printf("Digite o número funcional do professor: ");
+        scanf("%d", &professores[i].funcional);
+
+        int opcao;
+        do {
+            printf("Selecione a titulação do professor (escolha o número correspondente):\n");
+            printf("1. Especialista\n");
+            printf("2. Mestre\n");
+            printf("3. Doutor\n");
+            printf("Opção: ");
+            scanf("%d", &opcao);
+        } while (opcao < 1 || opcao > 3);
+
+        switch (opcao) {
+            case 1:
+                strcpy(professores[i].titulacao, "Especialista");
+                break;
+            case 2:
+                strcpy(professores[i].titulacao, "Mestre");
+                break;
+            case 3:
+                strcpy(professores[i].titulacao, "Doutor");
+                break;
+        }
+    }
+
+    for (i = 0; i < 2; i++) {
+        printf("\nCadastro da disciplina %d:\n", i + 1);
+
+        printf("Digite o nome da disciplina: ");
+        scanf("%s", disciplinas[i].nome);
+
+        printf("Digite o código da disciplina: ");
+        scanf("%d", &disciplinas[i].codigo);
+
+        printf("Digite a carga horária da disciplina: ");
+        scanf("%d", &disciplinas[i].carga_horaria);
+
+        printf("Selecione o professor responsável pela disciplina (escolha o número correspondente):\n");
+        for (int j = 0; j < 3; j++) {
+            printf("%d. %s\n", j + 1, professores[j].nome);
+        }
+        int opcao;
+        do {
+            printf("Opção: ");
+            scanf("%d", &opcao);
+        } while (opcao < 1 || opcao > 3);
+
+        disciplinas[i].professor_responsavel = professores[opcao - 1];
+        disciplinas[i].total_estudantes = 0;
+    }
+
+    for (i = 0; i < 15; i++) {
+        printf("\nCadastro do estudante %d:\n", i + 1);
+
+        printf("Digite o nome do estudante: ");
+        scanf("%s", estudantes[i].nome);
+
+        printf("Digite a matrícula do estudante: ");
+        scanf("%d", &estudantes[i].matricula);
+
+        estudantes[i].idade = le_valida_idade();
+
+        int opcao;
+        do {
+            printf("Selecione a disciplina em que o estudante será matriculado (escolha o número correspondente):\n");
+            for (int j = 0; j < 2; j++) {
+                printf("%d. %s\n", j + 1, disciplinas[j].nome);
+            }
+            printf("Opção: ");
+            scanf("%d", &opcao);
+        } while (opcao < 1 || opcao > 2);
+
+        int disciplina_index = opcao - 1;
+        Disciplina *disciplina = &disciplinas[disciplina_index];
+
+        if (disciplina->total_estudantes >= 10) {
+            printf("A disciplina já atingiu o limite máximo de estudantes.\n");
+            continue;
+        }
+
+        disciplina->estudantes[disciplina->total_estudantes] = i;
+        disciplina->total_estudantes++;
+    }
+
+    bubble_sort(estudantes, disciplinas[0].total_estudantes);
+
+    printf("\nRelatório dos alunos matriculados na primeira disciplina ordenados por idade:\n");
+    for (i = 0; i < disciplinas[0].total_estudantes; i++) {
+        int estudante_index = disciplinas[0].estudantes[i];
+        printf("%d  %s  %s  %d\n", disciplinas[0].codigo, disciplinas[0].professor_responsavel.nome,
+               estudantes[estudante_index].nome, estudantes[estudante_index].idade);
+    }
+
+    bubble_sort_desc(estudantes, disciplinas[1].total_estudantes);
+
+    printf("\nRelatório dos alunos matriculados na segunda disciplina ordenados por idade (ordem decrescente):\n");
+    for (i = 0; i < disciplinas[1].total_estudantes; i++) {
+        int estudante_index = disciplinas[1].estudantes[i];
+        printf("%d  %s  %s  %d\n", disciplinas[1].codigo, disciplinas[1].professor_responsavel.nome,
+               estudantes[estudante_index].nome, estudantes[estudante_index].idade);
+    }
+
+    return 0;
+}
