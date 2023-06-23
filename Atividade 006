@@ -1,0 +1,93 @@
+//Elabore um programa utilizando Structs onde o usuário realizará o cadastro de até 20 estudantes, cada estrutura de estudante deverá 
+//conter nome, matricula, idade e disciplina (disciplina deverá ser outra Struct cotendo nome da disciplina, carga horária e um vetor notas[4] 
+//para lançamento das notas n1, n2, n3 e n4), após os registros apresente o nome, média das quatro notas e idade de todos os estudantes, por fim 
+//apresente o(s) nome(s) do(s) estudante(s) com a maior média identificada (independente da disciplina).
+
+#include <stdio.h>
+
+#define TAM 20
+
+int le_valida_qtd_estudantes();
+
+int main(){
+
+    int qtd_estudantes=0, i=0, j=0;
+    float soma_notas=0, maior_media=0;
+
+    struct Disciplina{
+        char nome[20]; 
+        int carga_horaria; 
+        float notas[4];
+    };
+
+    struct Estudante{
+        char nome[50]; 
+        char matricula[10]; 
+        int idade;
+        struct Disciplina disciplina;
+        float media;
+    };
+    
+    printf("--- CADASTRO DE ESTUDANTES---\n");
+    
+    // TODO "Deseja sair?"
+    qtd_estudantes = le_valida_qtd_estudantes();
+
+    struct Estudante estudante[TAM];
+    
+    for(i=0;i<qtd_estudantes;i++){
+        printf("Nome: ");
+        scanf("%s", &estudante[i].nome);
+        
+        printf("Idade: ");
+        scanf("%d", &estudante[i].idade);
+
+        soma_notas=0;
+        for(j=0;j<4;j++){
+            printf("Informe a %da nota: ",j+1);
+            scanf("%f",&estudante[i].disciplina.notas[j]);
+            soma_notas += estudante[i].disciplina.notas[j];
+            if(j==3){
+                estudante[i].media = soma_notas/4;
+                if(estudante[i].media > maior_media){
+                    maior_media = estudante[i].media;
+                }
+            }
+        }
+
+    }
+
+    printf("--- TODOS ESTUDANTES CADASTRADOS ---\n");
+    for(i=0;i<qtd_estudantes;i++){
+        printf("%s\t%.1f\t%d\n", estudante[i].nome, estudante[i].media, estudante[i].idade);
+    }
+
+    printf("--- MAIOR MEDIA DA TURMA ---\n");
+    printf("%.1f\n",maior_media);
+
+    printf("--- ESTUDANTES COM A MAIOR MEDIA ---\n");
+    for(i=0;i<qtd_estudantes;i++){
+        if(estudante[i].media == maior_media){
+            printf("%s\n", estudante[i].nome);
+        }
+    }
+
+    return 0;
+}
+
+int le_valida_qtd_estudantes(){
+    int qtd_estudantes=0, cont=0;
+
+    do{
+        if(cont>0){
+            printf("############# ERRO ############\n");
+            printf("Valor devera estar entre 1 e 20\n");
+            printf("###############################\n");
+        }
+        printf("Informe a quantidade de estudantes: ");
+        scanf("%d", &qtd_estudantes);
+        cont++;
+    }while(qtd_estudantes<1 || qtd_estudantes>20);
+    
+    return qtd_estudantes;
+}
