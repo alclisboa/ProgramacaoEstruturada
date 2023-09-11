@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_NOME_ALUNOS 100
+#define MAX_NUM_NOTAS_ALUNO 2
+
+// **Função feita para calcular a média do aluno**
+float calcular_media_alunos(float notas[], int num_notas) {
+    // **Declara a variável soma para armazenar o somatório das notas**
+    float soma = 0.0;
+
+    // **Percorre o vetor de notas e adiciona cada nota à soma**
+    for (int i = 0; i < num_notas; i++) {
+        soma += notas[i];
+    }
+
+    // **Retorna a média das notas**
+    return soma / num_notas;
+}
+
+// **Função que determina se o aluno está reprovado ou aprovado**
+const char* determinar_situacao_aluno(float media) {
+    // **Verifica se a média é maior ou igual a 7,0**
+    if (media >= 7.0) {
+        // **Retorna "APROVADO"**
+        return "APROVADO";
+    } else {
+        // **Retorna "REPROVADO"**
+        return "REPROVADO";
+    }
+}
+
+int main() {
+    // **Abre os arquivos de entrada e saída**
+    FILE *entrada = fopen("DadosEntrada.csv", "r");
+    FILE *saida = fopen("SituacaoFinal.csv", "w");
+
+    // **Verifica se os arquivos foram abertos com sucesso**
+    if (entrada == NULL || saida == NULL) {
+        // **Imprime uma mensagem de erro e sai do programa**
+        printf("Erro ao abrir os arquivos");
+        exit(1);
+    }
+
+    // **Aloca memória para a string que armazenará uma linha do arquivo de entrada**
+    char linha[MAX_NOME_ALUNOS + 2 * (MAX_NUM_NOTAS_ALUNO + 1)];
+
+    // **Loop que itera sobre as linhas do arquivo de entrada**
+    while (fgets(linha, sizeof(linha), entrada) != NULL) {
+        // **Aloca memória para o vetor de notas**
+        float notas[100];
+
+        // **Declara as variáveis que armazenarão o nome e o número de notas do aluno**
+        char nome[MAX_NOME_ALUNOS];
+        int num_notas = 0;
+
+        // **Separa a string em tokens a partir da chave ","**
+        char *token = strtok(linha, ",");
+
+        // **Copia o primeiro token para a variável nome**
+        strcpy(nome, token);
+
+        // **Percorre o resto da string, separando os tokens e armazenando as notas no vetor notas**
+        while ((token = strtok(NULL, ",")) != NULL) {
+            notas[num_notas++] = atof(token);
+        }
+
+        // **Calcula a média das notas**
+        float media = calcular_media_alunos(notas + 2, num_notas - 2); // Ignorar os dois primeiros campos (nome e telefone)
+
+        // **Determina a situação do aluno**
+        const char *situacao = determinar_situacao_aluno(media);
+
+        // **Imprime a situação do aluno no arquivo de saída**
+        fprintf(saida, "%s, %.2f, %s\n", nome, media, situacao);
+    }
+
+    // **Fecha os arquivos**
+    fclose(entrada);
+    fclose(saida);
+
+    // **Imprime uma mensagem de conclusão**
+    printf("Arquivo SituacaoFinal.csv criado com sucesso! \n");
+
+    // **Retorna 0 para indicar que o programa terminou com sucesso**
+    return 0;
+}
